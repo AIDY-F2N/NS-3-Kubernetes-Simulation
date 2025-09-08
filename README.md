@@ -36,7 +36,7 @@ We publish two Docker image variants, each representing a different simulation s
     docker images hadilbouasker/ns3-app:v10.8
 
 <p align="center">
-  <img src="Figures/docker_image.png" alt="docker image" width="700"/>
+  <img src="Figures/dockerimage.png" alt="docker image" width="700"/>
 </p> 
 
 ### 3) Deploy to Kubernetes
