@@ -125,7 +125,7 @@ This is the resource usage visualization for **Scenario 1**
 This script builds upon the CTTC NS-3 MIMO demo, providing a framework for simulating MIMO scenarios using the 3GPP channel model from TR 38.900. The simulation environment consists of a single gNB and multiple UEs, dynamically adjusting key parameters according to predefined time intervals.  
 
 At each timestamp, the simulation script is regenerated using `automate_sim_with_UE.py`, with parameters such as `seconds`, `dataRate`, `packetSize`, and `numberOfUes`.  
-The **timestamps** are extracted from internet traffic traces available in the [Internet Traffic Archive (ITA)](https://ita.ee.lbl.gov/html/contrib/WorldCup.html). Other parameter values are generated and added to these timestamps, and for each timestamp, identical values are assigned across the multiple *request* columns in the CSV files (`one_month.csv` for Scenario 1 and `7_month.csv` for Scenario 2).  
+The **timestamps** are extracted from internet traffic traces available in the [Internet Traffic Archive (ITA)](https://ita.ee.lbl.gov/html/contrib). Other parameter values are generated and added to these timestamps, and for each timestamp, identical values are assigned across the multiple *request* columns in the CSV files (`one_month.csv` for Scenario 1 and `7_month.csv` for Scenario 2).  
 
 This design allows the simulation to capture realistic temporal dynamics from real traces while combining them with controlled workload parameters.
 
