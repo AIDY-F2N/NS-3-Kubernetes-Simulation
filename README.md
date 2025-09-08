@@ -145,6 +145,11 @@ Follow these steps to replace a file inside the docker image permanently:
 
     docker run -it --name my-container hadilbouasker/ns3-app:v10.8 bash
 
+<p align="center">
+  <img src="Figures/image_bash.png" alt="image_bash" width="700"/>
+</p>
+
+
 ### 2) Remove the old file inside the container:
 
     rm -rf /ns-3-dev/one_month.csv
