@@ -21,8 +21,7 @@ We publish two Docker image variants, each representing a different simulation s
 
 
 
-## Prerequisites
-- Ubuntu 20.04 (tested)  
+## Prerequisites 
 - A running Kubernetes cluster ; We assume that a Kubernetes cluster is already running using this repository: https://github.com/AIDY-F2N/build-k8s-cluster
 
 ## Quick Start
