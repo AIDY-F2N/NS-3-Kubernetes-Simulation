@@ -183,5 +183,8 @@ Delete the Kubernetes deployment.
 Remove the local Docker image to free up disk space.
 
     docker rmi -f hadilbouasker/ns3-app:v10.8
+    
+## Contact
 
+Hadil Bouasker, hadil.bouasker@telecom-sudparis.eu
 
