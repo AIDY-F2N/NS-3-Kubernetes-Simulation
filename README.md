@@ -16,10 +16,8 @@ We publish two Docker image variants, each representing a different simulation s
 
 | Image tag | Scenario | Description | CSV / Params |
 |-----------|----------|-------------|--------------|
-| `hadilbouasker/ns3-app:v10.8` | **Scenario 1 – High-frequency trace** | Workload generated from `one_month.csv`; updates occur at short intervals, creating a denser and busier workload profile | `one_month.csv` |
-| `hadilbouasker/ns3-app:v10.9` | **Scenario 2 – Lower-frequency trace** | Workload generated from `7_month.csv`; updates occur at wider intervals, leading to a less busy but still variable workload profile | `7_month.csv` |
-
-
+| `hadilbouasker/ns3-app:v10.8` | **Scenario 1 – High-frequency trace** | Workload generated from `one_month.csv`; runs for one month with short update intervals, creating a denser and busier workload profile | `one_month.csv` |
+| `hadilbouasker/ns3-app:v10.9` | **Scenario 2 – Lower-frequency trace** | Workload generated from `7_month.csv`; runs for months with wider update intervals, leading to a less busy but still variable workload profile | `7_month.csv` |
 
 ## Prerequisites 
 - A running Kubernetes cluster ; We assume that a Kubernetes cluster is already running using this repository: https://github.com/AIDY-F2N/build-k8s-cluster
