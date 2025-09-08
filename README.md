@@ -1,37 +1,52 @@
-# NS-3 Kubernetes pod
+# ns3-kubernetes-simulation
 
 <p align="center">
   <img src="Figures/1_IconsAll_Hori.png" alt="logo" width="800"/>
 </p>
 
 ## Description
-This repository contains an NS-3 simulation pod that runs a C++ script (NS-3) "cttc-nr-mimo-demo-vbr-auto-ue.cc" to simulate different network conditions based on parameters provided in a csv file "output_with_UE.csv" . The simulation updates parameters at each timestep based on different time intervals and executes within a Kubernetes environment.
-This project provides an NS-3 simulation environment running inside a Kubernetes pod. It dynamically updates parameters like the number of UEs, data rate, simulation time, and packet size based on the input CSV file , adjusting these values over different time intervals. In addition to running the simulation, the containerized setup offers real-time monitoring of CPU and memory usage using Prometheus, with resource usage visualizations generated through a Python script.
+This project provides an NS-3 simulation environment deployed in a Kubernetes pod. The simulation dynamically updates parameters such as the number of UEs, data rate, simulation time, and packet size based on the input CSV file (output_with_UE.csv), adapting these values over different time intervals. CPU and memory usage of the pod can be monitored with Prometheus, and a Python script is included to visualize these metrics over time.
+
+The result is an environment that mimics dynamic workloads, useful both for:
+- **Testing** system behavior under fluctuating demand
+- **Training** ML models on realistic resource-usage traces
+
+## Scenarios & Images
+We publish two Docker image variants, each representing a different simulation scenario:
+
+| Image tag | Scenario | Description | CSV / Params |
+|-----------|----------|-------------|--------------|
+| `hadilbouasker/ns3-app:v10.8` | **Scenario 1 – High-frequency trace** | Workload generated from `one_month.csv`; updates occur at short intervals, creating a denser and busier workload profile | `one_month.csv` |
+| `hadilbouasker/ns3-app:v10.9` | **Scenario 2 – Lower-frequency trace** | Workload generated from `7_month.csv`; updates occur at wider intervals, leading to a less busy but still variable workload profile | `7_month.csv` |
 
 
-## Pre-requisite
-Tested on Ubuntu 20.04
 
-# Install Docker and Build a K8s cluster
-To install Docker and build a Kubernetes cluster, refer to this repository : https://github.com/AIDY-F2N/OAI-UERANSIM?tab=readme-ov-file
+## Prerequisites
+- Ubuntu 20.04 (tested)  
+- A running Kubernetes cluster ; We assume that a Kubernetes cluster is already running using this repository: https://github.com/AIDY-F2N/build-k8s-cluster
 
-# Run the NS-3 Docker image and deploy the pod
+## Quick Start
 
-Follow these steps to pull the Docker image, run it locally, and deploy it into a Kubernetes pod:
+### 1) Pull the image
 
-Pull the latest version of the NS-3 simulation image from Docker Hub.
+    docker pull hadilbouasker/ns3-app:v10.8
 
-    docker pull hadilbouasker/ns3-app:v7.0
+### 2) verify the installation of the docker image
 
-Run this command to verify the installation of the docker image
-
-    docker images | grep hadilbouasker/ns3-app
+    docker images hadilbouasker/ns3-app:v10.8
 
 <p align="center">
-  <img src="Figures/docker_images.png" alt="docker image" width="700"/>
+  <img src="Figures/docker_image.png" alt="docker image" width="700"/>
 </p> 
 
-Apply the YAML configuration to deploy the NS-3 simulation as a pod in your cluster.
+### 3) Deploy to Kubernetes
+
+Edit the manifest file (`ns3-simulation-pod.yaml`) and set the image to either **Scenario 1** or **Scenario 2**:
+
+<p align="center">
+  <img src="Figures/manifest.png" alt="manifest" width="500"/>
+</p>
+Apply the manifest:
 
     kubectl apply -f ns3-simulation-pod.yaml
 
@@ -43,7 +58,9 @@ Check the status of the deployed pod to ensure it’s up and running.
   <img src="Figures/get_pods.png" alt="pod is running" width="700"/>
 </p>
 
-Check the logs of the pod by using this command:
+### 4) View logs
+
+This allows you to display the C++ simulation output, which helps verify that NS-3 is running correctly.
 
     kubectl logs <name-of-the-pod>
 
@@ -51,26 +68,19 @@ Check the logs of the pod by using this command:
   <img src="Figures/pod_logs.png" alt="Pod Logs" width="700"/>
 </p>
 
-# Setup Prometheus Monitoring
+## Setup Prometheus Monitoring
 
 In this phase, we set up Prometheus on our Kubernetes cluster. This setup collects node, pods, and service metrics automatically using Prometheus service discovery configurations.
 
-The "prometheus" folder contains all Prometheus Kubernetes Manifest Files. Inside the "prometheus" folder, open a terminal and execute the following command to create a new namespace named monitoring.
+Inside the "prometheus" folder, open a terminal and execute the following commands one by one:
 
     kubectl create namespace monitoring
-You can create the RBAC role by running the following command.
-
+    
     kubectl create -f clusterRole.yaml
-
-Create the ConfigMap by running the following command.
 
     kubectl create -f config-map.yaml
 
-Deploy Prometheus in the monitoring namespace using the following command.
-
     kubectl create  -f prometheus-deployment.yaml 
-
-You can check the created deployment using the following command.
 
     kubectl get deployments --namespace=monitoring
 
@@ -78,31 +88,25 @@ You can check the created deployment using the following command.
   <img src="Figures/prometheus1.png" alt="prometheus1" width="700"/>
 </p>
 
-
-You can check the created pod using the following command.
-
     kubectl get pods --namespace=monitoring
 
 <p align="center">
   <img src="Figures/prometheus2.png" alt="prometheus2" width="700"/>
 </p>
 
-
-Create the service using the following command:
+Finally, create the service using the following command:
 
     kubectl create -f prometheus-service.yaml --namespace=monitoring
 
 
-# Monitor CPU & Memory usage
+## Monitor CPU & Memory usage
 
 we included Prometheus-based monitoring to track resource usage inside the pod. A Python script is provided to visualize CPU and memory usage over time.
 
 Before running the monitoring script, make sure to update the following parameters:
 
 - **`--prometheus-url`**: replace with the URL of your Prometheus server.
-- **`--pod-name`**: replace with the name of your specific pod (you can get the pod name using `kubectl get pods`).
-
-
+- **`--pod-name`**: replace with the name of your specific pod.
 
       python3 monitor_resources.py --prometheus-url http://<your-prometheus-url>:<port> --pod-name <your-pod-name>
   
@@ -110,18 +114,26 @@ Example:
 
       python3 monitor_resources.py --prometheus-url http://157.159.68.41:30000 --pod-name ns3-simulation-847554cdf7-sxzl5
       
+This is the resource usage visualization for **Scenario 1**
+
 <p align="center">
-  <img src="Figures/cpu_memory_plot.png" alt="CPU & Memory Usage Plot" width="700"/>
+  <img src="Figures/cpu_memory_plots.png" alt="CPU & Memory Usage Plot" width="800"/>
 </p>
 
-# About cttc-nr-mimo-demo-vbr-auto-ue.cc
+## About cttc-nr-mimo-demo-vbr-auto-ue.cc
 
-This script builds upon the CTTC NS-3 MIMO demo, providing a framework for simulating MIMO scenarios using the 3GPP channel model from TR 38.900. The simulation environment consists of a single gNB and multiple UEs, dynamically adjusting key parameters according to predefined time intervals. The script is generated at each timestamp using the automate_sim_with_UE.py script, with changing variables including seconds, dataRate, simTime, packetSize, and numberOfUes, sourced from output_with_UE.csv. The simulation adapts to varying user densities and implements downlink flows with bandwidth adjustments.
+This script builds upon the CTTC NS-3 MIMO demo, providing a framework for simulating MIMO scenarios using the 3GPP channel model from TR 38.900. The simulation environment consists of a single gNB and multiple UEs, dynamically adjusting key parameters according to predefined time intervals.  
 
-# Modifications and customization
+At each timestamp, the simulation script is regenerated using `automate_sim_with_UE.py`, with parameters such as `seconds`, `dataRate`, `packetSize`, and `numberOfUes`.  
+The **timestamps** are extracted from internet traffic traces available in the [Internet Traffic Archive (ITA)](https://ita.ee.lbl.gov/html/contrib/WorldCup.html). Other parameter values are generated and added to these timestamps, and for each timestamp, identical values are assigned across the multiple *request* columns in the CSV files (`one_month.csv` for Scenario 1 and `7_month.csv` for Scenario 2).  
+
+This design allows the simulation to capture realistic temporal dynamics from real traces while combining them with controlled workload parameters.
+
+## Customize the Simulation
+
 If you plan to modify the simulation, you can modify the simulation behavior by:
 
-- Editing the output_with_UE.csv file to change the simulation parameters dynamically.
+- Editing the one_month.csv file for scénario1 or the 7_month.csv file for scénario2 to change input parameters dynamically.
 
 - Modifying the cttc-nr-mimo-demo-vbr-auto-ue.cc file to adjust the NS-3 simulation logic.
 
@@ -129,38 +141,39 @@ If you plan to modify the simulation, you can modify the simulation behavior by:
 
 Follow these steps to replace a file inside the docker image permanently:
 
-Run a container from the image:
+### 1) Run a container from the image:
 
-    docker run -it --name my-container hadilbouasker/ns3-app:v7.3 bash
+    docker run -it --name my-container hadilbouasker/ns3-app:v10.8 bash
 
-Remove the old file inside the container:
+### 2) Remove the old file inside the container:
 
-    rm -rf /ns-3-dev/output_with_UE.csv
+    rm -rf /ns-3-dev/one_month.csv
 
-open another terminal without exiting the running container and and copy the new file from your local machine:
+### 3) open another terminal without exiting the running container and copy the modified file from your local machine:
 
-    docker cp /home/user/new_output_with_UE.csv my-container:/ns-3-dev/output_with_UE.csv
+    docker cp /home/user/new_one_month.csv my-container:/ns-3-dev/one_month.csv
 
-now go back to the other terminal and exit the container:
+### 4) Now go back to the other terminal and exit the container:
 
     exit
 
-Commit the modified container to a new image:
+### 5) Commit the modified container to a new image:
 
-    docker commit my-container hadilbouasker/ns3-app:v7.1
+    docker commit my-container hadilbouasker/ns3-app:v11.0
 
-Run a new container from the modified image to verify:
+### 6) Run a new container from the modified image to verify:
 
-    docker run -it hadilbouasker/ns3-app:v7.1 bash
-    ls -lah /ns-3-dev/output_with_UE.csv
+    docker run -it hadilbouasker/ns3-app:v10.8 bash
+    ls -lah /ns-3-dev/one_month.csv
 
-You can push the new image to your own DockerHub:
+### 7) You can push the new image to your own DockerHub:
 
     docker login
-    docker push your-dockerhub-username/ns3-app:v7.1
-Lastly, to deploy the pod with the new image, you have to change the image name in the pod's manifest file.
+    docker push your-dockerhub-username/ns3-app:v11.0
+### 8) Lastly, to deploy the pod with the new image, you have to change the image name in the pod's manifest file.
 
-# Delete the pod and the docker image: 
+## Cleanup 
+
 To completely remove the NS-3 simulation pod and its associated Docker image from your system, use the following commands:
 
 Delete the Kubernetes deployment.
@@ -169,9 +182,6 @@ Delete the Kubernetes deployment.
 
 Remove the local Docker image to free up disk space.
 
-    docker rmi -f hadilbouasker/ns3-app:v7.0
+    docker rmi -f hadilbouasker/ns3-app:v10.8
 
-# Contact
-
-Hadil Bouasker, hadil.bouasker@telecom-sudparis.eu
 
