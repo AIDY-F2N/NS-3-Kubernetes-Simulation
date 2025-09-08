@@ -146,7 +146,7 @@ Follow these steps to replace a file inside the docker image permanently:
     docker run -it --name my-container hadilbouasker/ns3-app:v10.8 bash
 
 <p align="center">
-  <img src="Figures/image_bash.png" alt="image_bash" width="700"/>
+  <img src="Figures/image_bash.png" alt="image_bash" width="800"/>
 </p>
 
 
