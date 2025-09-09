@@ -5,7 +5,7 @@
 </p>
 
 ## Description
-This project provides an NS-3 simulation environment deployed in a Kubernetes pod. The simulation dynamically updates parameters such as the number of UEs, data rate, simulation time, and packet size based on the input CSV file (output_with_UE.csv), adapting these values over different time intervals. CPU and memory usage of the pod can be monitored with Prometheus, and a Python script is included to visualize these metrics over time.
+This project provides an NS-3 simulation environment deployed in a Kubernetes pod. The simulation dynamically updates parameters such as the number of UEs, data rate, simulation time, and packet size based on the input CSV files "one_month.csv" and "7_month.csv" , adapting these values over different time intervals. CPU and memory usage of the pod can be monitored with Prometheus, and a Python script is included to visualize these metrics over time.
 
 The result is an environment that mimics dynamic workloads, useful both for:
 - **Testing** system behavior under fluctuating demand
@@ -36,7 +36,11 @@ We publish two Docker image variants, each representing a different simulation s
   <img src="Figures/dockerimage.png" alt="docker image" width="700"/>
 </p> 
 
-### 3) Deploy to Kubernetes
+### 3) Clone this Repository
+
+    git clone https://github.com/AIDY-F2N/NS-3-Kubernetes-Simulation.git
+
+### 4) Deploy to Kubernetes
 
 Edit the manifest file (`ns3-simulation-pod.yaml`) and set the image to either **Scenario 1** or **Scenario 2**:
 
@@ -55,7 +59,7 @@ Check the status of the deployed pod to ensure it’s up and running.
   <img src="Figures/get_pods.png" alt="pod is running" width="700"/>
 </p>
 
-### 4) View logs
+### 5) View logs
 
 This allows you to display the C++ simulation output, which helps verify that NS-3 is running correctly.
 
